@@ -1,11 +1,17 @@
 <ion-app>
   <ion-split-pane contentId="main-content">
-    <ion-menu contentId="main-content" type="overlay">
+    <ion-menu contentId="main-content" type="overlay" [disabled]="(authService.currentUser() | async) === null">
       <!-- Navigation List -->
       <ion-content>
         <ion-list id="menu-list">
           <ion-list-header>
             <ion-label>Budget UI</ion-label>
+            <ion-chip>
+              <ion-avatar>
+                <img [src]="(authService.currentUser() | async)?.photoURL" />
+              </ion-avatar>
+              <ion-label>{{ (authService.currentUser() | async)?.displayName }}</ion-label>
+            </ion-chip>
           </ion-list-header>
           <ion-note></ion-note>
 
@@ -23,6 +29,16 @@
           </ion-menu-toggle>
         </ion-list>
       </ion-content>
+      <ion-footer>
+        <ion-toolbar>
+          <ion-buttons>
+            <ion-button *ngIf="authService.currentUser() | async" (click)="authService.logout()" color="primary">
+              <ion-icon class="ion-padding-end" name="log-out"></ion-icon>
+              Logout
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-footer>
     </ion-menu>
 
     <!-- Router Outlet -->
