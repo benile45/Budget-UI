@@ -3,6 +3,7 @@
 <!-- ------ -->
 <ion-header>
   <ion-toolbar>
+    <ion-progress-bar *ngIf="loading" type="indeterminate"></ion-progress-bar>
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
@@ -14,41 +15,44 @@
 <!-- Content -->
 <!-- ------- -->
 <ion-content>
-  <!-- Search & sort -->
-  <ion-grid class="ion-padding">
-    <ion-row>
-      <ion-col size="12" size-sm="6">
-        <ion-item>
-          <ion-icon name="swap-vertical" slot="start"></ion-icon>
-          <ion-select interface="popover" value="Name (A-Z)">
-            <ion-select-option>Created at (newest first)</ion-select-option>
-            <ion-select-option>Created at (oldest first)</ion-select-option>
-            <ion-select-option>Name (A-Z)</ion-select-option>
-            <ion-select-option>Name (Z-A)</ion-select-option>
-          </ion-select>
-        </ion-item>
-      </ion-col>
-      <ion-col size="12" size-sm="6">
-        <ion-item>
-          <ion-icon name="search" slot="start"></ion-icon>
-          <ion-input maxlength="40" placeholder="Search" [clearInput]="true"></ion-input>
-        </ion-item>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
+  <!-- Infinite Scroll -->
+  <ion-infinite-scroll [disabled]="lastPageReached || loading" (ionInfinite)="loadNextCategoryPage($event)">
+    <ion-infinite-scroll-content></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
 
-  <!-- Category list -->
-  <ion-list inset="true">
-    <!-- Categories -->
-    <ion-item button="true" [detail]="true" (click)="openModal()">
-      <ion-label>Auswärts Essen</ion-label>
+  <!-- Refresher -->
+  <ion-refresher slot="fixed" (ionRefresh)="reloadCategories($event)" [disabled]="loading">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Category List -->
+  <ion-list [ngSwitch]="categories?.length" inset="true">
+    <!-- Skeleton -->
+    <ng-container *ngSwitchCase="null">
+      <ion-item *ngFor="let i of [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]">
+        <ion-label>
+          <ion-skeleton-text [animated]="true" style="width: 80px"></ion-skeleton-text>
+        </ion-label>
+      </ion-item>
+    </ng-container>
+
+    <!-- Empty List -->
+    <ion-item *ngSwitchCase="0">
+      <ion-icon slot="start" name="alert-circle-outline"></ion-icon>
+      <ion-label> No categories found </ion-label>
     </ion-item>
-  </ion-list>
 
-  <!-- Create fab button -->
-  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-    <ion-fab-button (click)="openModal()">
-      <ion-icon name="add"></ion-icon>
-    </ion-fab-button>
-  </ion-fab>
+    <!-- Categories -->
+    <ng-container *ngSwitchDefault>
+      <ion-item
+        button="true"
+        *ngFor="let category of categories"
+        [detail]="true"
+        [disabled]="loading"
+        (click)="openModal(category)"
+      >
+        <ion-label> {{ category.name }} </ion-label>
+      </ion-item>
+    </ng-container>
+  </ion-list>
 </ion-content>
