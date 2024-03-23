@@ -26,6 +26,7 @@ export class CategoryListComponent {
     { label: 'Name (Z-A)', value: 'name,desc' },
   ];
   private readonly searchFormSubscription: Subscription;
+
   constructor(
     private readonly modalCtrl: ModalController,
     private readonly categoryService: CategoryService,
