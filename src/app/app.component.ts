@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, Injector } from '@angular/core';
 import { categoriesPath, expensesPath } from './shared/routes';
 import { AuthService } from './shared/service/auth.service';
+import { UpdateService } from './shared/service/update.service';
 
 @Component({
   selector: 'app-root',
@@ -13,5 +14,10 @@ export class AppComponent {
     { title: 'Categories', url: `/${categoriesPath}`, icon: 'pricetag' },
   ];
 
-  constructor(readonly authService: AuthService) {}
+  constructor(
+    readonly authService: AuthService,
+    private readonly injector: Injector,
+  ) {
+    this.injector.get(UpdateService); // Reference UpdateService here as it won't be created otherwise
+  }
 }
