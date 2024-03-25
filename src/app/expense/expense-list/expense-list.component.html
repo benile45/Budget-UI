@@ -1,1 +1,79 @@
-Expense List
+<!-- ------ -->
+<!-- Header -->
+<!-- ------ -->
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Expenses</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<!-- ------- -->
+<!-- Content -->
+<!-- ------- -->
+<ion-content>
+  <!-- Search & sort -->
+  <ion-grid class="ion-padding">
+    <ion-row>
+      <ion-col size="12" size-sm="4">
+        <ion-item>
+          <ion-icon name="swap-vertical" slot="start"></ion-icon>
+          <ion-select interface="popover" value="Date (newest first)">
+            <ion-select-option>Created at (newest first)</ion-select-option>
+            <ion-select-option>Created at (oldest first)</ion-select-option>
+            <ion-select-option>Date (newest first)</ion-select-option>
+            <ion-select-option>Date (oldest first)</ion-select-option>
+            <ion-select-option>Name (A-Z)</ion-select-option>
+            <ion-select-option>Name (Z-A)</ion-select-option>
+          </ion-select>
+        </ion-item>
+      </ion-col>
+      <ion-col size="12" size-sm="4">
+        <ion-item>
+          <ion-icon name="pricetag" slot="start"></ion-icon>
+          <ion-select interface="popover" placeholder="Category"> </ion-select>
+        </ion-item>
+      </ion-col>
+      <ion-col size="12" size-sm="4">
+        <ion-item>
+          <ion-icon name="search" slot="start"></ion-icon>
+          <ion-input maxlength="40" placeholder="Search" [clearInput]="true"></ion-input>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <!-- Empty list -->
+  <ion-list inset="true" role="list">
+    <ion-item>
+      <ion-icon slot="start" name="alert-circle-outline"> </ion-icon>
+      <ion-label>No expenses found</ion-label>
+    </ion-item>
+  </ion-list>
+
+  <!-- Create fab button -->
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="openModal()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>
+
+<!-- Footer -->
+<ion-footer>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="addMonths(-1)">
+        <ion-icon name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{ date | date: 'MMMM yyyy' }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="addMonths(1)">
+        <ion-icon name="arrow-forward"> </ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-footer>
