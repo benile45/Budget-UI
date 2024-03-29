@@ -4,7 +4,7 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-button color="medium" (click)="cancel()">
+      <ion-button color="medium" (click)="cancel()" [disabled]="submitting">
         <ion-icon slot="start" name="close"></ion-icon>
         Cancel
       </ion-button>
@@ -13,18 +13,22 @@
     <ion-title>Add Expense</ion-title>
 
     <ion-buttons slot="end">
-      <ion-button (click)="save()">
+      <ion-button (click)="save()" [disabled]="expenseForm.pristine || expenseForm.invalid || submitting">
         <ion-icon slot="start" name="save"></ion-icon>
         Save
       </ion-button>
     </ion-buttons>
+
+    <!-- Progress Bar -->
+
+    <ion-progress-bar *ngIf="submitting" type="indeterminate"></ion-progress-bar>
   </ion-toolbar>
 </ion-header>
 
 <!-- ------- -->
 <!-- Content -->
 <!-- ------- -->
-<ion-content class="ion-padding">
+<ion-content class="ion-padding" [formGroup]="expenseForm">
   <ion-item>
     <ion-icon name="text" slot="start"></ion-icon>
     <ion-input maxlength="40" placeholder="Enter the expenses's name" required></ion-input>
@@ -32,8 +36,12 @@
 
   <ion-item>
     <ion-icon name="pricetag" slot="start"></ion-icon>
-    <ion-select interface="popover" placeholder="Choose a category" formControlName="categoryId"> </ion-select>
-    <ion-button slot="end">
+    <ion-select interface="popover" placeholder="Choose a category" formControlName="categoryId">
+      <ion-select-option *ngFor="let category of categories" [value]="category.id">{{
+        category.name
+      }}</ion-select-option>
+    </ion-select>
+    <ion-button slot="end" (click)="openModal()">
       <ion-icon slot="icon-only" name="add"></ion-icon>
     </ion-button>
   </ion-item>
@@ -55,7 +63,8 @@
 
   <ion-item>
     <ion-icon name="calendar" slot="start"></ion-icon>
-    <ion-datetime-button datetime="datetime"></ion-datetime-button>
+    <ion-datetime-button datetime="date"></ion-datetime-button>
+
     <ion-modal [keepContentsMounted]="true">
       <ng-template>
         <ion-datetime id="datetime"></ion-datetime>
