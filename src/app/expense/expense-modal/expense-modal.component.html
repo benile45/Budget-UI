@@ -31,7 +31,7 @@
 <ion-content class="ion-padding" [formGroup]="expenseForm">
   <ion-item>
     <ion-icon name="text" slot="start"></ion-icon>
-    <ion-input maxlength="40" placeholder="Enter the expenses's name" required></ion-input>
+    <ion-input maxlength="40" placeholder="Enter the expenses's name" required formControlName="name"></ion-input>
   </ion-item>
 
   <ion-item>
@@ -64,10 +64,9 @@
   <ion-item>
     <ion-icon name="calendar" slot="start"></ion-icon>
     <ion-datetime-button datetime="date"></ion-datetime-button>
-
     <ion-modal [keepContentsMounted]="true">
       <ng-template>
-        <ion-datetime id="datetime"></ion-datetime>
+        <ion-datetime id="date"></ion-datetime>
       </ng-template>
     </ion-modal>
   </ion-item>

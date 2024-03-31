@@ -9,6 +9,7 @@ import { Category } from '../../shared/domain';
 import { CategoryModalComponent } from '../../category/category-modal/category-modal.component';
 import { formatISO, parseISO } from 'date-fns';
 import { CategoryService } from '../../category/category.service';
+import { id } from 'date-fns/locale';
 
 @Component({
   selector: 'app-expense-modal',
@@ -30,6 +31,9 @@ export class ExpenseModalComponent {
   ) {
     this.expenseForm = this.formBuilder.group({
       name: ['', [Validators.required, Validators.maxLength(40)]],
+      amount: ['', [Validators.required, Validators.min(0.01)]],
+      date: [formatISO(new Date())],
+      categoryId: [],
     });
   }
 
