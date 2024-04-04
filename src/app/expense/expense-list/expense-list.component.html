@@ -3,6 +3,7 @@
 <!-- ------ -->
 <ion-header>
   <ion-toolbar>
+    <ion-progress-bar *ngIf="loading" type="indeterminate"></ion-progress-bar>
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
@@ -33,28 +34,78 @@
       <ion-col size="12" size-sm="4">
         <ion-item>
           <ion-icon name="pricetag" slot="start"></ion-icon>
-          <ion-select interface="popover" placeholder="Category"> </ion-select>
+          <ion-select interface="popover" placeholder="Category"></ion-select>
         </ion-item>
       </ion-col>
       <ion-col size="12" size-sm="4">
         <ion-item>
           <ion-icon name="search" slot="start"></ion-icon>
-          <ion-input maxlength="40" placeholder="Search" [clearInput]="true"></ion-input>
+          <ion-input [clearInput]="true" maxlength="40" placeholder="Search"></ion-input>
         </ion-item>
       </ion-col>
     </ion-row>
   </ion-grid>
 
-  <!-- Empty list -->
-  <ion-list inset="true" role="list">
-    <ion-item>
-      <ion-icon slot="start" name="alert-circle-outline"> </ion-icon>
-      <ion-label>No expenses found</ion-label>
+  <!-- Infinite Scroll -->
+  <ion-infinite-scroll (ionInfinite)="loadNextExpensePage($event)" [disabled]="lastPageReached || loading">
+    <ion-infinite-scroll-content></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
+  <!-- Refresher -->
+  <ion-refresher (ionRefresh)="reloadExpenses($event)" [disabled]="loading" slot="fixed">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Expense List -->
+
+  <ion-list [ngSwitch]="expenseGroups?.length" inset="true">
+    <!-- Skeleton -->
+    <ng-container *ngSwitchCase="null">
+      <ion-item *ngFor="let i of [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]">
+        <ion-label>
+          <ion-skeleton-text [animated]="true" style="width: 80px"></ion-skeleton-text>
+        </ion-label>
+      </ion-item>
+    </ng-container>
+
+    <!-- Empty List -->
+    <ion-item *ngSwitchCase="0">
+      <ion-icon name="alert-circle-outline" slot="start"></ion-icon>
+      <ion-label> No expenses found</ion-label>
     </ion-item>
+
+    <!-- Expenses -->
+    <ion-item-group *ngFor="let expenseGroup of expenseGroups">
+      <ion-item-divider>
+        <ion-label>{{ expenseGroup.date }}</ion-label>
+      </ion-item-divider>
+      <ion-item
+        (click)="openModal()"
+        *ngFor="let expense of expenseGroup.expenses"
+        [detail]="true"
+        [disabled]="loading"
+        button="true"
+      >
+        <ion-label>
+          <ion-grid>
+            <ion-row>
+              <ion-col>
+                {{ expense.name }}
+              </ion-col>
+              <ion-col>
+                <ion-icon name="pricetag"></ion-icon>
+                {{ expense.category }}
+              </ion-col>
+              <ion-col> CHF {{ expense.amount }}.00 </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-label>
+      </ion-item>
+    </ion-item-group>
   </ion-list>
 
   <!-- Create fab button -->
-  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+  <ion-fab horizontal="end" slot="fixed" vertical="bottom">
     <ion-fab-button (click)="openModal()">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
@@ -65,14 +116,14 @@
 <ion-footer>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-button (click)="addMonths(-1)">
+      <ion-button (click)="reloadExpenses(addMonths(-1))">
         <ion-icon name="arrow-back"></ion-icon>
       </ion-button>
     </ion-buttons>
     <ion-title>{{ date | date: 'MMMM yyyy' }}</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="addMonths(1)">
-        <ion-icon name="arrow-forward"> </ion-icon>
+      <ion-button (click)="reloadExpenses(addMonths(1))">
+        <ion-icon name="arrow-forward"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>

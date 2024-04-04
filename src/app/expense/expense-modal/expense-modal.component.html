@@ -37,9 +37,9 @@
   <ion-item>
     <ion-icon name="pricetag" slot="start"></ion-icon>
     <ion-select interface="popover" placeholder="Choose a category" formControlName="categoryId">
-      <ion-select-option *ngFor="let category of categories" [value]="category.id">{{
-        category.name
-      }}</ion-select-option>
+      <ion-select-option *ngFor="let category of categories" [value]="category.id"
+        >{{ category.name }}
+      </ion-select-option>
     </ion-select>
     <ion-button slot="end" (click)="openModal()">
       <ion-icon slot="icon-only" name="add"></ion-icon>
@@ -66,7 +66,7 @@
     <ion-datetime-button datetime="date"></ion-datetime-button>
     <ion-modal [keepContentsMounted]="true">
       <ng-template>
-        <ion-datetime id="date"></ion-datetime>
+        <ion-datetime presentation="date" id="date" formControlName="date"></ion-datetime>
       </ng-template>
     </ion-modal>
   </ion-item>
