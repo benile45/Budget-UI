@@ -31,7 +31,7 @@ interface ExpenseGroup {
 export class ExpenseListComponent {
   date = set(new Date(), { date: 1 });
   expenseGroups: ExpenseGroup[] | null = null;
-  readonly initialSort = 'date.desc';
+  readonly initialSort = 'date,desc';
   lastPageReached = false;
   loading = false;
   searchCriteria: ExpenseCriteria = { page: 0, size: 25, sort: this.initialSort };
@@ -41,8 +41,8 @@ export class ExpenseListComponent {
   readonly sortOptions: SortOption[] = [
     { label: 'Created at (newest first)', value: 'createdAt,desc' },
     { label: 'Created at (oldest first)', value: 'createdAt,asc' },
-    { label: 'Date (newest first)', value: 'date.desc' },
-    { label: 'Date (oldest first)', value: 'date.asc' },
+    { label: 'Date (newest first)', value: 'date,desc' },
+    { label: 'Date (oldest first)', value: 'date,asc' },
     { label: 'Name (A-Z)', value: 'name,asc' },
     { label: 'Name (Z-A)', value: 'name,desc' },
   ];
