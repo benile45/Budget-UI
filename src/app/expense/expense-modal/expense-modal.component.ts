@@ -1,15 +1,16 @@
 import { Component } from '@angular/core';
-import { ModalController } from '@ionic/angular';
-import { filter, finalize, from } from 'rxjs';
+import { ModalController, RefresherCustomEvent } from '@ionic/angular';
+import { filter, finalize, from, groupBy, mergeMap, tap, toArray } from 'rxjs';
 import { ActionSheetService } from '../../shared/service/action-sheet.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ExpenseService } from '../expense.service';
 import { ToastService } from '../../shared/service/toast.service';
-import { Category } from '../../shared/domain';
+import { Category, Expense, ExpenseCriteria, ExpenseUpsertDto } from '../../shared/domain';
 import { CategoryModalComponent } from '../../category/category-modal/category-modal.component';
 import { formatISO, parseISO } from 'date-fns';
 import { CategoryService } from '../../category/category.service';
 import { id } from 'date-fns/locale';
+import { formatPeriod } from '../../shared/period';
 
 @Component({
   selector: 'app-expense-modal',
@@ -20,6 +21,9 @@ export class ExpenseModalComponent {
 
   readonly expenseForm: FormGroup;
   submitting = false;
+
+  // Passed into the component by the ModalController, available in the ionViewWillEnter
+  expense: Expense = {} as Expense;
 
   constructor(
     private readonly actionSheetService: ActionSheetService,
@@ -33,7 +37,8 @@ export class ExpenseModalComponent {
       name: ['', [Validators.required, Validators.maxLength(40)]],
       amount: ['', [Validators.required, Validators.min(0.01)]],
       date: [formatISO(new Date())],
-      categoryId: [],
+      categoryId: [undefined],
+      id: [], //hidden
     });
   }
 
@@ -45,6 +50,9 @@ export class ExpenseModalComponent {
   }
 
   ionViewWillEnter(): void {
+    const { id, amount, category, date, name } = this.expense;
+    this.expenseForm.patchValue({ id, amount, categoryId: category?.id, date, name });
+    if (category) this.categories.push(category);
     this.loadAllCategories();
   }
 
@@ -70,19 +78,20 @@ export class ExpenseModalComponent {
   }
 
   delete(): void {
-    from(this.actionSheetService.showDeletionConfirmation('Are you sure you want to delete this expense?'))
-      .pipe(filter((action) => action === 'delete'))
-      .subscribe(() => this.modalCtrl.dismiss(null, 'delete'));
-  }
-
-  async openModal(category?: Category): Promise<void> {
-    const modal = await this.modalCtrl.create({
-      component: CategoryModalComponent,
-      componentProps: { category: category ? { ...category } : {} },
-    });
-    modal.present();
-    const { role } = await modal.onWillDismiss();
-    if (role === 'refresh') this.reloadCategories();
+    from(this.actionSheetService.showDeletionConfirmation('Are you sure you want to delete this delete?'))
+      .pipe(
+        filter((action) => action === 'delete'),
+        tap(() => (this.submitting = true)),
+        mergeMap(() => this.expenseService.deleteExpense(this.expense.id!)),
+        finalize(() => (this.submitting = false)),
+      )
+      .subscribe({
+        next: () => {
+          this.toastService.displaySuccessToast('Expense deleted');
+          this.modalCtrl.dismiss(null, 'refresh');
+        },
+        error: (error) => this.toastService.displayErrorToast('Could not delete expense', error),
+      });
   }
 
   async showCategoryModal(): Promise<void> {
@@ -91,6 +100,4 @@ export class ExpenseModalComponent {
     const { role } = await categoryModal.onWillDismiss();
     console.log('role', role);
   }
-
-  private reloadCategories() {}
 }

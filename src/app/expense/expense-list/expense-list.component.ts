@@ -18,7 +18,6 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { ExpenseService } from '../expense.service';
 import { CategoryModalComponent } from '../../category/category-modal/category-modal.component';
 import { group } from '@angular/animations';
-import { id } from 'date-fns/locale';
 
 interface ExpenseGroup {
   date: string;
@@ -70,7 +69,10 @@ export class ExpenseListComponent {
   };
 
   async openModal(expense?: Expense): Promise<void> {
-    const modal = await this.modalCtrl.create({ component: ExpenseModalComponent });
+    const modal = await this.modalCtrl.create({
+      component: ExpenseModalComponent,
+      componentProps: { expense: expense ? { ...expense } : {} },
+    });
     modal.present();
     const { role } = await modal.onWillDismiss();
     if (role === 'refresh') this.reloadExpenses();
@@ -141,6 +143,4 @@ export class ExpenseListComponent {
   ionViewDidLeave(): void {
     this.searchFormSubscription.unsubscribe();
   }
-
-  protected readonly id = id;
 }
