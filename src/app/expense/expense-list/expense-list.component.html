@@ -31,8 +31,10 @@
       <ion-col size="12" size-sm="4">
         <ion-item>
           <ion-icon name="pricetag" slot="start"></ion-icon>
-          <ion-select interface="popover" placeholder="Category" formControlName="categoryIds">
-            <ion-select-option [value]="categories"></ion-select-option>
+          <ion-select interface="popover" placeholder="Category" formControlName="categoryIds" multiple="true">
+            <ion-select-option *ngFor="let category of categories" [value]="category.id">{{
+              category.name
+            }}</ion-select-option>
           </ion-select>
         </ion-item>
       </ion-col>

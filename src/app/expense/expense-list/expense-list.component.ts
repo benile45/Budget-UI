@@ -18,6 +18,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { ExpenseService } from '../expense.service';
 import { CategoryModalComponent } from '../../category/category-modal/category-modal.component';
 import { group } from '@angular/animations';
+import { id } from 'date-fns/locale';
 
 interface ExpenseGroup {
   date: string;
@@ -53,6 +54,7 @@ export class ExpenseListComponent {
     private readonly expenseService: ExpenseService,
     private readonly toastService: ToastService,
     private readonly formBuilder: FormBuilder,
+    private readonly categoryService: CategoryService,
   ) {
     this.searchForm = this.formBuilder.group({ name: [], sort: [this.initialSort], categoryIds: [this.categories] });
     this.searchFormSubscription = this.searchForm.valueChanges
@@ -114,8 +116,16 @@ export class ExpenseListComponent {
 
   private sortExpenses = (expenses: Expense[]): Expense[] => expenses.sort((a, b) => a.name.localeCompare(b.name));
 
+  private loadAllCategories(): void {
+    this.categoryService.getAllCategories({ sort: 'name,asc' }).subscribe({
+      next: (categories) => (this.categories = categories),
+      error: (error) => this.toastService.displayErrorToast('Could not load categories', error),
+    });
+  }
+
   ionViewDidEnter(): void {
     this.loadExpenses();
+    this.loadAllCategories();
   }
 
   loadNextExpensePage($event: any) {
@@ -131,4 +141,6 @@ export class ExpenseListComponent {
   ionViewDidLeave(): void {
     this.searchFormSubscription.unsubscribe();
   }
+
+  protected readonly id = id;
 }
