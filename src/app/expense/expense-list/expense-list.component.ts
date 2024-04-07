@@ -68,16 +68,6 @@ export class ExpenseListComponent {
     this.date = addMonths(this.date, number);
   };
 
-  async openModal(expense?: Expense): Promise<void> {
-    const modal = await this.modalCtrl.create({
-      component: ExpenseModalComponent,
-      componentProps: { expense: expense ? { ...expense } : {} },
-    });
-    modal.present();
-    const { role } = await modal.onWillDismiss();
-    if (role === 'refresh') this.reloadExpenses();
-  }
-
   private loadExpenses(next: () => void = () => {}): void {
     this.searchCriteria.yearMonth = formatPeriod(this.date);
     if (!this.searchCriteria.categoryIds?.length) delete this.searchCriteria.categoryIds;
@@ -123,6 +113,16 @@ export class ExpenseListComponent {
       next: (categories) => (this.categories = categories),
       error: (error) => this.toastService.displayErrorToast('Could not load categories', error),
     });
+  }
+
+  async openModal(expense?: Expense): Promise<void> {
+    const modal = await this.modalCtrl.create({
+      component: ExpenseModalComponent,
+      componentProps: { expense: expense ? { ...expense } : {} },
+    });
+    modal.present();
+    const { role } = await modal.onWillDismiss();
+    if (role === 'refresh') this.reloadExpenses();
   }
 
   ionViewDidEnter(): void {

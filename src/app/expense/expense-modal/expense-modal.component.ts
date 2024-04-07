@@ -11,6 +11,7 @@ import { formatISO, parseISO } from 'date-fns';
 import { CategoryService } from '../../category/category.service';
 import { id } from 'date-fns/locale';
 import { formatPeriod } from '../../shared/period';
+import { load } from '@angular-devkit/build-angular/src/utils/server-rendering/esm-in-memory-file-loader';
 
 @Component({
   selector: 'app-expense-modal',
@@ -34,11 +35,11 @@ export class ExpenseModalComponent {
     private readonly toastService: ToastService,
   ) {
     this.expenseForm = this.formBuilder.group({
+      id: [],
       name: ['', [Validators.required, Validators.maxLength(40)]],
       amount: ['', [Validators.required, Validators.min(0.01)]],
       date: [formatISO(new Date())],
       categoryId: [undefined],
-      id: [], //hidden
     });
   }
 
@@ -52,8 +53,8 @@ export class ExpenseModalComponent {
   ionViewWillEnter(): void {
     const { id, amount, category, date, name } = this.expense;
     this.expenseForm.patchValue({ id, amount, categoryId: category?.id, date, name });
-    if (category) this.categories.push(category);
     this.loadAllCategories();
+    console.log('Loaded expense:', this.expense);
   }
 
   cancel(): void {
