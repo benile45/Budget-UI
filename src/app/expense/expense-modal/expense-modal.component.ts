@@ -35,7 +35,6 @@ export class ExpenseModalComponent {
     private readonly toastService: ToastService,
   ) {
     this.expenseForm = this.formBuilder.group({
-      id: [],
       name: ['', [Validators.required, Validators.maxLength(40)]],
       amount: ['', [Validators.required, Validators.min(0.01)]],
       date: [formatISO(new Date())],
@@ -54,7 +53,7 @@ export class ExpenseModalComponent {
     const { id, amount, category, date, name } = this.expense;
     this.expenseForm.patchValue({ id, amount, categoryId: category?.id, date, name });
     this.loadAllCategories();
-    console.log('Loaded expense:', this.expense);
+    if (category) this.categories.push(category);
   }
 
   cancel(): void {
@@ -99,6 +98,5 @@ export class ExpenseModalComponent {
     const categoryModal = await this.modalCtrl.create({ component: CategoryModalComponent });
     categoryModal.present();
     const { role } = await categoryModal.onWillDismiss();
-    console.log('role', role);
   }
 }

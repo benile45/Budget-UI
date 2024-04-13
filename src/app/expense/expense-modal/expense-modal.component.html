@@ -10,7 +10,7 @@
       </ion-button>
     </ion-buttons>
 
-    <ion-title>Add Expense</ion-title>
+    <ion-title>{{ expense.id ? 'Edit' : 'Add' }} expense</ion-title>
 
     <ion-buttons slot="end">
       <ion-button (click)="save()" [disabled]="expenseForm.pristine || expenseForm.invalid || submitting">
@@ -37,6 +37,7 @@
   <ion-item>
     <ion-icon name="pricetag" slot="start"></ion-icon>
     <ion-select interface="popover" placeholder="Choose a category" formControlName="categoryId">
+      <ion-select-option [value]="null"></ion-select-option>
       <ion-select-option *ngFor="let category of categories" [value]="category.id"
         >{{ category.name }}
       </ion-select-option>
@@ -70,4 +71,10 @@
       </ng-template>
     </ion-modal>
   </ion-item>
+
+  <ion-fab *ngIf="expense.id" slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="delete()" color="danger" [disabled]="submitting">
+      <ion-icon name="trash"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>

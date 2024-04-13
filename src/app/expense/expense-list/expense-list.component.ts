@@ -120,6 +120,7 @@ export class ExpenseListComponent {
       component: ExpenseModalComponent,
       componentProps: { expense: expense ? { ...expense } : {} },
     });
+    console.log('Expense in openModal:', expense);
     modal.present();
     const { role } = await modal.onWillDismiss();
     if (role === 'refresh') this.reloadExpenses();
